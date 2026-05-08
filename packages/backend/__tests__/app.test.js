@@ -61,4 +61,30 @@ describe('API Endpoints', () => {
       expect(response.body.error).toBe('Item name is required');
     });
   });
+
+  describe('DELETE /api/items/:id', () => {
+    it('should delete an existing item', async () => {
+      // First create an item to delete
+      const created = await request(app)
+        .post('/api/items')
+        .send({ name: 'Item to Delete' })
+        .set('Accept', 'application/json');
+
+      const id = created.body.id;
+
+      const response = await request(app).delete(`/api/items/${id}`);
+      expect(response.status).toBe(204);
+
+      // Confirm it no longer exists
+      const getResponse = await request(app).get('/api/items');
+      const ids = getResponse.body.map((i) => i.id);
+      expect(ids).not.toContain(id);
+    });
+
+    it('should return 404 when deleting a non-existent item', async () => {
+      const response = await request(app).delete('/api/items/99999');
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Item not found');
+    });
+  });
 });

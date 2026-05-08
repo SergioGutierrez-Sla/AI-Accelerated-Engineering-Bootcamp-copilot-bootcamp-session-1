@@ -63,4 +63,21 @@ app.post('/api/items', (req, res) => {
   }
 });
 
+app.delete('/api/items/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    db.prepare('DELETE FROM items WHERE id = ?').run(id);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).json({ error: 'Failed to delete item' });
+  }
+});
+
 module.exports = { app, db, insertStmt };
