@@ -58,12 +58,87 @@ button:hover {
   background-color: #21a1c9;
 }
 
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.edit-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #61dafb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.edit-btn {
+  padding: 4px 10px;
+  background-color: #f0a500;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+
+.edit-btn:hover {
+  background-color: #c47f00;
+}
+
+.save-btn {
+  padding: 4px 10px;
+  background-color: #43a047;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+
+.save-btn:hover {
+  background-color: #2e7d32;
+}
+
+.cancel-btn {
+  padding: 4px 10px;
+  background-color: #757575;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+
+.cancel-btn:hover {
+  background-color: #424242;
+}
+
+.sort-btn {
+  margin: 8px 0;
+  padding: 6px 14px;
+  background-color: #90a4ae;
+  color: white;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+.sort-btn:hover {
+  background-color: #607d8b;
+}
+
+.sort-btn--active {
+  background-color: #1976d2;
+}
+
+.sort-btn--active:hover {
+  background-color: #0d47a1;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
 }
 
 li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px;
   border-bottom: 1px solid #ddd;
   text-align: left;
@@ -71,6 +146,20 @@ li {
 
 li:last-child {
   border-bottom: none;
+}
+
+li .delete-btn {
+  padding: 4px 10px;
+  background-color: #e53935;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+li .delete-btn:hover {
+  background-color: #b71c1c;
 }
 
 .error {

@@ -63,6 +63,29 @@ app.post('/api/items', (req, res) => {
   }
 });
 
+app.put('/api/items/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return res.status(400).json({ error: 'Item name is required' });
+    }
+
+    const item = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    db.prepare('UPDATE items SET name = ? WHERE id = ?').run(name.trim(), id);
+    const updated = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+    res.json(updated);
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ error: 'Failed to update item' });
+  }
+});
+
 app.delete('/api/items/:id', (req, res) => {
   try {
     const { id } = req.params;

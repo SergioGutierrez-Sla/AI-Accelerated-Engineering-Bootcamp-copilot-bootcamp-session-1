@@ -6,6 +6,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newItem, setNewItem] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState('');
+  const [sortAlpha, setSortAlpha] = useState(false);
+
+  const displayedData = sortAlpha
+    ? [...data].sort((a, b) => a.name.localeCompare(b.name))
+    : data;
 
   useEffect(() => {
     fetchData();
@@ -29,7 +36,39 @@ function App() {
     }
   };
 
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+    setEditingName(item.name);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditingName('');
+  };
+
+  const handleUpdate = async (id) => {
+    if (!editingName.trim()) return;
+    try {
+      const response = await fetch(`/api/items/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editingName }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update item');
+      }
+      const updated = await response.json();
+      setData(data.map((item) => (item.id === id ? updated : item)));
+      setEditingId(null);
+      setEditingName('');
+    } catch (err) {
+      setError('Error updating item: ' + err.message);
+      console.error('Error updating item:', err);
+    }
+  };
+
   const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
     try {
       const response = await fetch(`/api/items/${id}`, { method: 'DELETE' });
       if (!response.ok) {
@@ -91,15 +130,41 @@ function App() {
 
         <section className="items-section">
           <h2>Items from Database</h2>
+          <button
+            className={`sort-btn${sortAlpha ? ' sort-btn--active' : ''}`}
+            onClick={() => setSortAlpha(!sortAlpha)}
+          >
+            {sortAlpha ? 'Sort: A → Z (on)' : 'Sort: A → Z (off)'}
+          </button>
           {loading && <p>Loading data...</p>}
           {error && <p className="error">{error}</p>}
           {!loading && !error && (
             <ul>
-              {data.length > 0 ? (
-                data.map((item) => (
+              {displayedData.length > 0 ? (
+                displayedData.map((item) => (
                   <li key={item.id}>
-                    {item.name}
-                    <button onClick={() => handleDelete(item.id)}>Delete</button>
+                    {editingId === item.id ? (
+                      <>
+                        <input
+                          className="edit-input"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          aria-label="Edit item name"
+                        />
+                        <div className="item-actions">
+                          <button className="save-btn" onClick={() => handleUpdate(item.id)}>Save</button>
+                          <button className="cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span>{item.name}</span>
+                        <div className="item-actions">
+                          <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
+                          <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
+                        </div>
+                      </>
+                    )}
                   </li>
                 ))
               ) : (

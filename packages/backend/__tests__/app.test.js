@@ -62,6 +62,51 @@ describe('API Endpoints', () => {
     });
   });
 
+  describe('PUT /api/items/:id', () => {
+    it('should update an existing item', async () => {
+      const created = await request(app)
+        .post('/api/items')
+        .send({ name: 'Original Name' })
+        .set('Accept', 'application/json');
+
+      const id = created.body.id;
+
+      const response = await request(app)
+        .put(`/api/items/${id}`)
+        .send({ name: 'Updated Name' })
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(id);
+      expect(response.body.name).toBe('Updated Name');
+    });
+
+    it('should return 404 when updating a non-existent item', async () => {
+      const response = await request(app)
+        .put('/api/items/99999')
+        .send({ name: 'Any Name' })
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Item not found');
+    });
+
+    it('should return 400 if name is empty when updating', async () => {
+      const created = await request(app)
+        .post('/api/items')
+        .send({ name: 'Some Item' })
+        .set('Accept', 'application/json');
+
+      const response = await request(app)
+        .put(`/api/items/${created.body.id}`)
+        .send({ name: '' })
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error', 'Item name is required');
+    });
+  });
+
   describe('DELETE /api/items/:id', () => {
     it('should delete an existing item', async () => {
       // First create an item to delete
